@@ -1,0 +1,100 @@
+/* ==========================================
+   图书借阅管理系统 - 全局样式
+   活泼校园风格设计
+   ========================================== */
+
+:root {
+  /* 主题色彩 */
+  --primary-color: #4A90E2;
+  --primary-light: #6BA3E6;
+  --primary-dark: #357ABD;
+  --secondary-color: #FF9F43;
+  --success-color: #2ECC71;
+  --danger-color: #FF6B6B;
+  --warning-color: #FDCB58;
+  --info-color: #17A2B8;
+
+  /* 背景渐变 */
+  --bg-gradient-start: #E3F2FD;
+  --bg-gradient-end: #FFFFFF;
+  --card-bg: #FFFFFF;
+
+  /* 文字颜色 */
+  --text-primary: #2C3E50;
+  --text-secondary: #7F8C8D;
+  --text-light: #BDC3C7;
+
+  /* 边框 */
+  --border-color: #E0E0E0;
+  --border-radius: 15px;
+  --border-radius-sm: 8px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(74, 144, 226, 0.1);
+  --shadow-md: 0 4px 16px rgba(74, 144, 226, 0.15);
+  --shadow-lg: 0 8px 24px rgba(74, 144, 226, 0.2);
+
+  /* 间距 */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   导航栏样式
+   ========================================== */
+.navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: var(--shadow-md);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-brand::before {
+  content: "📚";
+  font-size: 1.8rem;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem !important;
+  border-radius: var(--border-radius-sm);
+}
+
+.nav-link:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.25);
+  color: white !important;
+}
+

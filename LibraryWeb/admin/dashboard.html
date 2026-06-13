@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理控制台 - 图书借阅管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* 导航栏样式 - 活泼校园风 */
+        nav.navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15) !important;
+            padding: 1rem 0 !important;
+        }
+
+        nav.navbar .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        nav.navbar .nav-link:hover,
+        nav.navbar .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        nav.navbar .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-in;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 32px rgba(74, 144, 226, 0.25);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .content-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            box-shadow: 0 12px 32px rgba(74, 144, 226, 0.2);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .quick-action-btn {
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
+            border-color: #667eea;
+        }
+
+        .quick-action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">图书借阅系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html"><i class="bi bi-house"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html"><i class="bi bi-speedometer2"></i> 控制台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../books/list.html"><i class="bi bi-book"></i> 图书列表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../borrow/my-borrows.html"><i class="bi bi-clock-history"></i> 我的借阅</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../borrow/all-borrows.html"><i class="bi bi-journal-text"></i> 全部借阅</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../categories/manage.html"><i class="bi bi-tags"></i> 分类管理</a>
+                    </li>
+                    <li class="nav-item" data-permission="admin">
+                        <a class="nav-link" href="../users/manage.html"><i class="bi bi-people"></i> 用户管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../users/profile.html"><i class="bi bi-person-circle"></i> 个人信息</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="userName">加载中...</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="Auth.logout()">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container mt-4">
+        <!-- 欢迎标题 -->
+        <div class="mb-4 fade-in">
+            <h2 class="fw-bold" style="color: #667eea;">
+                📊 管理控制台
+            </h2>
+            <p class="text-muted">欢迎回来，这里是图书借阅管理系统的管理中心</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-value text-primary" id="totalBooks">0</div>
+                        <div class="stat-label">图书总数</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value text-success" id="availableBooks">0</div>
+                        <div class="stat-label">可借图书</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-value text-info" id="totalUsers">0</div>
+                        <div class="stat-label">用户总数</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon">📤</div>
+                        <div class="stat-value text-warning" id="activeBorrows">0</div>
+                        <div class="stat-label">在借图书</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card content-card fade-in">
+                    <div class="card-header-custom">
+                        <i class="bi bi-lightning-fill"></i>
+                        ⚡ 快捷操作
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <a href="../books/add.html" class="quick-action-btn">
+                                    <div class="quick-action-icon">➕</div>
+                                    <div class="quick-action-label">添加图书</div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <a href="../books/list.html" class="quick-action-btn">
+                                    <div class="quick-action-icon">📖</div>
+                                    <div class="quick-action-label">图书管理</div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <a href="../users/manage.html" class="quick-action-btn">
+                                    <div class="quick-action-icon">👥</div>
+                                    <div class="quick-action-label">用户管理</div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <a href="../categories/manage.html" class="quick-action-btn">
+                                    <div class="quick-action-icon">🏷️</div>
+                                    <div class="quick-action-label">分类管理</div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <a href="../borrow/all-borrows.html" class="quick-action-btn">
+                                    <div class="quick-action-icon">📋</div>
+                                    <div class="quick-action-label">借阅管理</div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6">
+                                <a href="../borrow/my-borrows.html" class="quick-action-btn">
+                                    <div class="quick-action-icon">📤</div>
+                                    <div class="quick-action-label">我的借阅</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近活动 -->
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card content-card fade-in">
+                    <div class="card-header-custom">
+                        <i class="bi bi-clock-history"></i>
+                        📅 最近借阅
+                    </div>
+                    <div class="card-body" id="recentBorrows">
+                        <p class="text-muted text-center">暂无数据</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="card content-card fade-in">
+                    <div class="card-header-custom">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        ⚠️ 逾期提醒
+                    </div>
+                    <div class="card-body" id="overdueList">
+                        <p class="text-muted text-center">暂无逾期</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/permission.js"></script>
+    <script src="../js/router-guard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            RouterGuard.checkAuth();
+            
+            // 应用权限控制，隐藏无权限的菜单项
+            const perm = new PermissionManager();
+            perm.applyPermissions();
+
+            // 检查权限（仅管理员和图书管理员可访问）
+            if (!perm.hasRole('librarian') && !perm.hasRole('admin')) {
+                alert('无权访问此页面');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            Storage.initSampleData();
+            loadDashboardData();
+        });
+
+        function loadDashboardData() {
+            const currentUser = Storage.getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.realName || currentUser.username;
+
+            // 加载统计数据
+            loadStatistics();
+
+            // 加载最近借阅
+            loadRecentBorrows();
+
+            // 加载逾期列表
+            loadOverdueList();
+        }
+
+        function loadStatistics() {
+            const books = Storage.getBooks();
+            const users = Storage.getUsers();
+            const borrows = Storage.getBorrows();
+
+            const totalBooks = books.length;
+            const availableBooks = books.reduce((sum, book) => sum + (book.availableCopies || 0), 0);
+            const totalUsers = users.length;
+            const activeBorrows = borrows.filter(b => !b.returnDate).length;
+
+            document.getElementById('totalBooks').textContent = totalBooks;
+            document.getElementById('availableBooks').textContent = availableBooks;
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('activeBorrows').textContent = activeBorrows;
+        }
+
+        function loadRecentBorrows() {
+            const borrows = Storage.getBorrows();
+            const recentBorrows = borrows
+                .sort((a, b) => new Date(b.borrowDate) - new Date(a.borrowDate))
+                .slice(0, 5);
+
+            const container = document.getElementById('recentBorrows');
+
+            if (recentBorrows.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">暂无数据</p>';
+                return;
+            }
+
+            container.innerHTML = recentBorrows.map(borrow => {
+                const user = Storage.getUserById(borrow.userId);
+                const book = Storage.getBookById(borrow.bookId);
+                const userName = user ? (user.realName || user.username) : '未知用户';
+                const bookTitle = book ? book.title : '未知图书';
+
+                return `
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div>
+                            <div class="fw-bold">${bookTitle}</div>
+                            <small class="text-muted">${userName}</small>
+                        </div>
+                        <small class="text-muted">${formatDate(borrow.borrowDate)}</small>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadOverdueList() {
+            const borrows = Storage.getBorrows();
+            const now = new Date();
+            const overdueBorrows = borrows.filter(borrow => {
+                return !borrow.returnDate && now > new Date(borrow.dueDate);
+            });
+
+            const container = document.getElementById('overdueList');
+
+            if (overdueBorrows.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">暂无逾期</p>';
+                return;
+            }
+
+            container.innerHTML = overdueBorrows.map(borrow => {
+                const user = Storage.getUserById(borrow.userId);
+                const book = Storage.getBookById(borrow.bookId);
+                const userName = user ? (user.realName || user.username) : '未知用户';
+                const bookTitle = book ? book.title : '未知图书';
+                const daysOverdue = Math.floor((now - new Date(borrow.dueDate)) / (1000 * 60 * 60 * 24));
+
+                return `
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div>
+                            <div class="fw-bold text-danger">${bookTitle}</div>
+                            <small class="text-muted">${userName} · 逾期${daysOverdue}天</small>
+                        </div>
+                        <span class="badge badge-danger">逾期</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书详情 - 图书借阅管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* 导航栏样式 - 活泼校园风 */
+        nav.navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15) !important;
+            padding: 1rem 0 !important;
+        }
+
+        nav.navbar .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        nav.navbar .nav-link:hover,
+        nav.navbar .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        nav.navbar .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .detail-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-meta {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .detail-meta span {
+            display: inline-block;
+            margin-right: 1.5rem;
+        }
+
+        .detail-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.1);
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4A90E2;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.25);
+        }
+
+        .btn {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">图书借阅系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html"><i class="bi bi-house"></i> 首页</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../admin/dashboard.html"><i class="bi bi-speedometer2"></i> 控制台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="list.html"><i class="bi bi-book"></i> 图书列表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../borrow/my-borrows.html"><i class="bi bi-clock-history"></i> 我的借阅</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../borrow/all-borrows.html"><i class="bi bi-journal-text"></i> 全部借阅</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../categories/manage.html"><i class="bi bi-tags"></i> 分类管理</a>
+                    </li>
+                    <li class="nav-item" data-permission="admin">
+                        <a class="nav-link" href="../users/manage.html"><i class="bi bi-people"></i> 用户管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../users/profile.html"><i class="bi bi-person-circle"></i> 个人信息</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="userName">加载中...</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="Auth.logout()">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 详情头部 -->
+    <div class="detail-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="detail-title" id="bookTitle">加载中...</h1>
+                    <div class="detail-meta" id="bookMeta">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div id="actionButtons">
+                        <!-- 动态生成操作按钮 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="container">
+        <div class="row">
+            <!-- 左侧：详细信息 -->
+            <div class="col-lg-8">
+                <!-- 基本信息 -->
+                <div class="detail-section fade-in">
+                    <h5 class="section-title">📖 基本信息</h5>
+                    <table class="table table-borderless">
+                        <tbody id="basicInfo">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 存放位置 -->
+                <div class="detail-section fade-in">
+                    <h5 class="section-title">📍 存放位置</h5>
+                    <div id="locationInfo">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 图书描述 -->
+                <div class="detail-section fade-in">
+                    <h5 class="section-title">📋 图书简介</h5>
+                    <p id="bookDescription" class="text-muted">
+                        <!-- 动态生成 -->
+                    </p>
+                </div>
+
+                <!-- 标签 -->
+                <div class="detail-section fade-in">
+                    <h5 class="section-title">🏷️ 标签</h5>
+                    <div id="bookTags">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：统计信息 -->
+            <div class="col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">📊 统计信息</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted">累计借阅</small>
+                            <h4 class="mb-0 text-primary" id="borrowCount">0</h4>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">评分</small>
+                            <h4 class="mb-0 text-warning" id="rating">0</h4>
+                        </div>
+                        <div>
+                            <small class="text-muted">库存状态</small>
+                            <div id="stockStatus">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">⚡ 快捷操作</h6>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-outline-primary w-100 mb-2" onclick="window.location.href='list.html'">
+                            <i class="bi bi-arrow-left"></i> 返回列表
+                        </button>
+                        <button class="btn btn-outline-secondary w-100" onclick="window.print()">
+                            <i class="bi bi-printer"></i> 打印信息
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/permission.js"></script>
+    <script src="../js/router-guard.js"></script>
+    <script src="../js/books.js"></script>
+    <script>
+        let currentBook = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            RouterGuard.checkAuth();
+            Storage.initSampleData();
+
+            // 应用权限控制，隐藏无权限的菜单项
+            const perm = new PermissionManager();
+            perm.applyPermissions();
+
+            loadBookDetail();
+        });
+        
+        function loadBookDetail() {
+            const currentUser = Storage.getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.realName || currentUser.username;
+            
+            // 从URL获取图书ID
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = parseInt(urlParams.get('id'));
+            
+            if (!bookId) {
+                alert('无效的图书ID');
+                window.location.href = 'list.html';
+                return;
+            }
+            
+            const bookManager = new BookManager();
+            currentBook = bookManager.getBookById(bookId);
+            
+            if (!currentBook) {
+                alert('图书不存在');
+                window.location.href = 'list.html';
+                return;
+            }
+            
+            renderBookDetail();
+        }
+        
+        function renderBookDetail() {
+            // 标题
+            document.getElementById('bookTitle').textContent = currentBook.title;
+            
+            // 元信息
+            document.getElementById('bookMeta').innerHTML = `
+                <span><i class="bi bi-person"></i> ${currentBook.author}</span>
+                <span><i class="bi bi-tag"></i> ${currentBook.category || '未分类'}</span>
+                <span><i class="bi bi-calendar"></i> ${currentBook.publishDate || '未知'}</span>
+            `;
+            
+            // 基本信息
+            document.getElementById('basicInfo').innerHTML = `
+                <tr>
+                    <td><strong>ISBN：</strong></td>
+                    <td>${currentBook.isbn || '-'}</td>
+                </tr>
+                <tr>
+                    <td><strong>出版社：</strong></td>
+                    <td>${currentBook.publisher || '-'}</td>
+                </tr>
+                <tr>
+                    <td><strong>出版日期：</strong></td>
+                    <td>${currentBook.publishDate || '未知'}</td>
+                </tr>
+                <tr>
+                    <td><strong>版本：</strong></td>
+                    <td>${currentBook.edition || '-'}</td>
+                </tr>
+                <tr>
+                    <td><strong>页数：</strong></td>
+                    <td>${currentBook.pages || '未知'}</td>
+                </tr>
+                <tr>
+                    <td><strong>语言：</strong></td>
+                    <td>${currentBook.language || '中文'}</td>
+                </tr>
+            `;
+            
+            // 存放位置
+            if (currentBook.location) {
+                document.getElementById('locationInfo').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-geo-alt"></i>
+                        <strong>${currentBook.location.building || '未知'}</strong><br>
+                        <small>
+                            ${currentBook.location.floor || ''} 
+                            ${currentBook.location.room || ''} 
+                            ${currentBook.location.shelf || ''} 
+                            ${currentBook.location.position || ''}
+                        </small>
+                    </div>
+                `;
+            } else {
+                document.getElementById('locationInfo').innerHTML = '<p class="text-muted">位置信息未知</p>';
+            }
+            
+            // 描述
+            document.getElementById('bookDescription').textContent = 
+                currentBook.description || '暂无简介';
+            
+            // 标签
+            if (currentBook.tags && currentBook.tags.length > 0) {
+                document.getElementById('bookTags').innerHTML = currentBook.tags.map(tag => 
+                    `<span class="badge badge-primary me-1">${tag}</span>`
+                ).join('');
+            } else {
+                document.getElementById('bookTags').innerHTML = '<span class="text-muted">无标签</span>';
+            }
+            
+            // 统计信息
+            document.getElementById('borrowCount').textContent = currentBook.borrowCount || 0;
+            document.getElementById('rating').textContent = currentBook.rating ? `⭐${currentBook.rating}` : '暂无评分';
+            
+            // 库存状态
+            document.getElementById('stockStatus').innerHTML = `
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: ${(currentBook.availableCopies / currentBook.totalCopies * 100)}%">
+                        ${currentBook.availableCopies}/${currentBook.totalCopies}
+                    </div>
+                </div>
+                <small class="text-muted mt-1 d-block">
+                    可借：${currentBook.availableCopies} / 总数：${currentBook.totalCopies}
+                </small>
+            `;
+            
+            // 操作按钮
+            generateActionButtons();
+        }
+        
+        function generateActionButtons() {
+            const perm = new PermissionManager();
+            const container = document.getElementById('actionButtons');
+            
+            let html = '';
+            
+            if (currentBook.availableCopies > 0) {
+                html += `
+                    <button class="btn btn-success btn-lg mb-2" onclick="borrowBook()">
+                        <i class="bi bi-check-circle"></i> 立即借阅
+                    </button>
+                `;
+            } else {
+                html += `
+                    <button class="btn btn-secondary btn-lg mb-2" disabled>
+                        已全部借出
+                    </button>
+                `;
+            }
+            
+            if (perm.can('edit', 'books')) {
+                html += `
+                    <button class="btn btn-warning btn-lg mb-2 ms-2" onclick="editBook()">
+                        <i class="bi bi-pencil"></i> 编辑
+                    </button>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function borrowBook() {
+            if (!confirm('确认借阅此图书？')) {
+                return;
+            }
+            
+            try {
+                const bookManager = new BookManager();
+                bookManager.borrowBook(currentBook.id);
+                
+                alert('借阅成功！');
+                location.reload();
+            } catch (error) {
+                alert('借阅失败：' + error.message);
+            }
+        }
+        
+        function editBook() {
+            window.location.href = `edit.html?id=${currentBook.id}`;
+        }
+    </script>
+</body>
+</html>

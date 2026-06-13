@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全部借阅 - 图书借阅管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* 导航栏样式 - 活泼校园风 */
+        nav.navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15) !important;
+            padding: 1rem 0 !important;
+        }
+
+        nav.navbar .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        nav.navbar .nav-link:hover,
+        nav.navbar .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        nav.navbar .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.25);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .borrow-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.1);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .borrow-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
+        }
+
+        .borrow-card.overdue {
+            border-left: 5px solid #FF6B6B;
+        }
+
+        .borrow-card.returned {
+            opacity: 0.7;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.1);
+        }
+
+        .table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .btn {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">图书借阅系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html"><i class="bi bi-house"></i> 首页</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../admin/dashboard.html"><i class="bi bi-speedometer2"></i> 控制台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../books/list.html"><i class="bi bi-book"></i> 图书列表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-borrows.html"><i class="bi bi-clock-history"></i> 我的借阅</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="all-borrows.html"><i class="bi bi-journal-text"></i> 全部借阅</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../categories/manage.html"><i class="bi bi-tags"></i> 分类管理</a>
+                    </li>
+                    <li class="nav-item" data-permission="admin">
+                        <a class="nav-link" href="../users/manage.html"><i class="bi bi-people"></i> 用户管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../users/profile.html"><i class="bi bi-person-circle"></i> 个人信息</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="userName">加载中...</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="Auth.logout()">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container mt-4">
+        <!-- 统计卡片 -->
+        <div class="row mb-4 fade-in">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-value text-primary" id="totalBorrows">0</div>
+                        <div class="stat-label">总借阅数</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-value text-success" id="activeBorrows">0</div>
+                        <div class="stat-label">在借图书</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-value text-warning" id="returnedCount">0</div>
+                        <div class="stat-label">已归还</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-value text-danger" id="overdueCount">0</div>
+                        <div class="stat-label">逾期图书</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索和筛选 -->
+        <div class="card mb-4 fade-in">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchInput" placeholder="🔍 搜索用户名、书名...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="all">全部状态</option>
+                            <option value="borrowing">在借</option>
+                            <option value="returned">已还</option>
+                            <option value="overdue">逾期</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control" id="dateFilter">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onclick="filterBorrows()">
+                            <i class="bi bi-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 借阅列表 -->
+        <div class="card fade-in">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户</th>
+                                <th>书名</th>
+                                <th>借阅日期</th>
+                                <th>应还日期</th>
+                                <th>归还日期</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrowTableBody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 空状态 -->
+        <div id="emptyState" class="empty-state d-none">
+            <div class="empty-state-icon">📦</div>
+            <h5>暂无借阅记录</h5>
+            <p class="text-muted">当前没有符合条件的借阅数据</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/permission.js"></script>
+    <script src="../js/router-guard.js"></script>
+    <script src="../js/borrows.js"></script>
+    <script>
+        let allBorrows = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            RouterGuard.checkAuth();
+            
+            // 应用权限控制，隐藏无权限的菜单项
+            const perm = new PermissionManager();
+            perm.applyPermissions();
+
+            // 检查权限（仅管理员和图书管理员可访问）
+            if (!perm.hasRole('librarian') && !perm.hasRole('admin')) {
+                alert('无权访问此页面');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            Storage.initSampleData();
+            loadPageData();
+        });
+
+        function loadPageData() {
+            const currentUser = Storage.getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.realName || currentUser.username;
+
+            // 加载所有借阅记录
+            loadAllBorrows();
+        }
+
+        function loadAllBorrows() {
+            const borrowManager = new BorrowManager();
+            allBorrows = borrowManager.getAllBorrows();
+            renderBorrows(allBorrows);
+            updateStatistics(allBorrows);
+        }
+
+        function renderBorrows(borrows) {
+            const tbody = document.getElementById('borrowTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (borrows.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('d-none');
+                return;
+            }
+
+            emptyState.classList.add('d-none');
+
+            tbody.innerHTML = borrows.map(borrow => {
+                const user = Storage.getUserById(borrow.userId);
+                const book = Storage.getBookById(borrow.bookId);
+                const userName = user ? (user.realName || user.username) : '未知用户';
+                const bookTitle = book ? book.title : '未知图书';
+                
+                const statusBadge = getStatusBadge(borrow);
+                const actionButtons = getActionButtons(borrow);
+
+                return `
+                    <tr>
+                        <td>${borrow.id}</td>
+                        <td>${userName}</td>
+                        <td>${bookTitle}</td>
+                        <td>${formatDate(borrow.borrowDate)}</td>
+                        <td>${formatDate(borrow.dueDate)}</td>
+                        <td>${borrow.returnDate ? formatDate(borrow.returnDate) : '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionButtons}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadge(borrow) {
+            const now = new Date();
+            const dueDate = new Date(borrow.dueDate);
+            const isOverdue = !borrow.returnDate && now > dueDate;
+
+            if (borrow.returnDate) {
+                return '<span class="badge badge-success">已归还</span>';
+            } else if (isOverdue) {
+                return '<span class="badge badge-danger">逾期</span>';
+            } else {
+                return '<span class="badge badge-primary">在借</span>';
+            }
+        }
+
+        function getActionButtons(borrow) {
+            if (!borrow.returnDate) {
+                return `<button class="btn btn-sm btn-success" onclick="returnBook(${borrow.id})">
+                            <i class="bi bi-check-circle"></i> 归还
+                        </button>`;
+            }
+            return '-';
+        }
+
+        function updateStatistics(borrows) {
+            const now = new Date();
+            const total = borrows.length;
+            const active = borrows.filter(b => !b.returnDate).length;
+            const returned = borrows.filter(b => b.returnDate).length;
+            const overdue = borrows.filter(b => {
+                return !b.returnDate && now > new Date(b.dueDate);
+            }).length;
+
+            document.getElementById('totalBorrows').textContent = total;
+            document.getElementById('activeBorrows').textContent = active;
+            document.getElementById('returnedCount').textContent = returned;
+            document.getElementById('overdueCount').textContent = overdue;
+        }
+
+        function filterBorrows() {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const date = document.getElementById('dateFilter').value;
+
+            const borrowManager = new BorrowManager();
+            let filtered = borrowManager.getAllBorrows();
+
+            // 关键词搜索
+            if (keyword) {
+                filtered = filtered.filter(borrow => {
+                    const user = Storage.getUserById(borrow.userId);
+                    const book = Storage.getBookById(borrow.bookId);
+                    const userName = user ? (user.realName || user.username).toLowerCase() : '';
+                    const bookTitle = book ? book.title.toLowerCase() : '';
+                    return userName.includes(keyword) || bookTitle.includes(keyword);
+                });
+            }
+
+            // 状态筛选
+            if (status !== 'all') {
+                const now = new Date();
+                filtered = filtered.filter(borrow => {
+                    if (status === 'returned') return borrow.returnDate;
+                    if (status === 'borrowing') return !borrow.returnDate && now <= new Date(borrow.dueDate);
+                    if (status === 'overdue') return !borrow.returnDate && now > new Date(borrow.dueDate);
+                    return true;
+                });
+            }
+
+            // 日期筛选
+            if (date) {
+                filtered = filtered.filter(borrow => {
+                    return borrow.borrowDate.startsWith(date);
+                });
+            }
+
+            renderBorrows(filtered);
+            updateStatistics(filtered);
+        }
+
+        function returnBook(borrowId) {
+            if (!confirm('确认归还此图书？')) {
+                return;
+            }
+
+            try {
+                const borrowManager = new BorrowManager();
+                borrowManager.returnBook(borrowId);
+
+                alert('归还成功！');
+                loadAllBorrows();
+            } catch (error) {
+                alert('归还失败：' + error.message);
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        // 回车搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                filterBorrows();
+            }
+        });
+    </script>
+</body>
+</html>

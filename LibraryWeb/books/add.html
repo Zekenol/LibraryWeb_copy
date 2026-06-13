@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加图书 - 图书借阅管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* 导航栏样式 - 活泼校园风 */
+        nav.navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15) !important;
+            padding: 1rem 0 !important;
+        }
+
+        nav.navbar .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        nav.navbar .nav-link:hover,
+        nav.navbar .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        nav.navbar .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4A90E2;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">图书借阅系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html"><i class="bi bi-house"></i> 首页</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../admin/dashboard.html"><i class="bi bi-speedometer2"></i> 控制台</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="list.html"><i class="bi bi-book"></i> 图书列表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../borrow/my-borrows.html"><i class="bi bi-clock-history"></i> 我的借阅</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../borrow/all-borrows.html"><i class="bi bi-journal-text"></i> 全部借阅</a>
+                    </li>
+                    <li class="nav-item" data-permission="librarian">
+                        <a class="nav-link" href="../categories/manage.html"><i class="bi bi-tags"></i> 分类管理</a>
+                    </li>
+                    <li class="nav-item" data-permission="admin">
+                        <a class="nav-link" href="../users/manage.html"><i class="bi bi-people"></i> 用户管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../users/profile.html"><i class="bi bi-person-circle"></i> 个人信息</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="userName">加载中...</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="Auth.logout()">退出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container form-container">
+        <div class="form-card">
+            <h1 class="page-title">➕ 添加图书</h1>
+
+            <form id="addBookForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="title" class="form-label">📚 书名 *</label>
+                        <input type="text" class="form-control" id="title" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="author" class="form-label">✍️ 作者 *</label>
+                        <input type="text" class="form-control" id="author" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="isbn" class="form-label">🔢 ISBN</label>
+                        <input type="text" class="form-control" id="isbn">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="publisher" class="form-label">🏢 出版社</label>
+                        <input type="text" class="form-control" id="publisher">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="categoryId" class="form-label">📂 分类</label>
+                        <select class="form-select" id="categoryId">
+                            <option value="">请选择分类</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="publishDate" class="form-label">📅 出版日期</label>
+                        <input type="date" class="form-control" id="publishDate">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="totalCopies" class="form-label">📊 总数量</label>
+                        <input type="number" class="form-control" id="totalCopies" min="1" value="1">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="availableCopies" class="form-label">✅ 可借数量</label>
+                        <input type="number" class="form-control" id="availableCopies" min="0" value="1">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="edition" class="form-label">📝 版本</label>
+                        <input type="text" class="form-control" id="edition" placeholder="例如：第3版">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">📋 图书简介</label>
+                    <textarea class="form-control" id="description" rows="3"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tags" class="form-label">🏷️ 标签（用逗号分隔）</label>
+                    <input type="text" class="form-control" id="tags" placeholder="例如：编程,JavaScript,前端">
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='list.html'">
+                        <i class="bi bi-x-circle"></i> 取消
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> 保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/permission.js"></script>
+    <script src="../js/router-guard.js"></script>
+    <script src="../js/books.js"></script>
+    <script src="../js/categories.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            RouterGuard.checkAuth();
+            Storage.initSampleData();
+
+            // 应用权限控制，隐藏无权限的菜单项
+            const perm = new PermissionManager();
+            perm.applyPermissions();
+
+            const currentUser = Storage.getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.realName || currentUser.username;
+
+            // 检查权限
+            if (!perm.can('create', 'books')) {
+                alert('没有权限添加图书');
+                window.location.href = 'list.html';
+                return;
+            }
+            
+            loadCategories();
+        });
+
+        function loadCategories() {
+            const categoryManager = new CategoryManager();
+            const categories = categoryManager.getAllCategories();
+            
+            const select = document.getElementById('categoryId');
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+        }
+
+        document.getElementById('addBookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const bookData = {
+                title: document.getElementById('title').value.trim(),
+                author: document.getElementById('author').value.trim(),
+                isbn: document.getElementById('isbn').value.trim(),
+                publisher: document.getElementById('publisher').value.trim(),
+                categoryId: document.getElementById('categoryId').value ? parseInt(document.getElementById('categoryId').value) : null,
+                publishDate: document.getElementById('publishDate').value,
+                totalCopies: parseInt(document.getElementById('totalCopies').value),
+                availableCopies: parseInt(document.getElementById('availableCopies').value),
+                edition: document.getElementById('edition').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t)
+            };
+
+            try {
+                const bookManager = new BookManager();
+                bookManager.addBook(bookData);
+                
+                alert('图书添加成功！');
+                window.location.href = 'list.html';
+            } catch (error) {
+                alert('添加失败：' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
