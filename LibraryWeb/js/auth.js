@@ -72,8 +72,9 @@ const Auth = {
     Storage.clearCurrentUser();
     localStorage.removeItem('sessionToken');
 
+    const isHomePage = /\/index\.html$/i.test(window.location.pathname) || window.location.pathname === '/index.html';
     const loginUrl = new URL(
-      window.location.pathname.split('/').length > 2 ? '../login.html' : 'login.html',
+      isHomePage ? 'login.html' : '../login.html',
       window.location.href
     );
 

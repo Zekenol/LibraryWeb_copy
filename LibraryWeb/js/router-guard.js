@@ -50,8 +50,9 @@ const RouterGuard = {
     }
 
     if (!Storage.isLoggedIn()) {
+      const isHomePage = currentPage === 'index.html' || currentPage.endsWith('/index.html');
       const loginUrl = new URL(
-        currentPage.split('/').length > 1 ? '../login.html' : 'login.html',
+        isHomePage ? 'login.html' : '../login.html',
         window.location.href
       );
       window.location.replace(`${loginUrl.toString()}?t=${Date.now()}`);
@@ -101,8 +102,9 @@ const RouterGuard = {
    */
   redirectToLogin() {
     const currentPage = this.getCurrentPage();
+    const isHomePage = currentPage === 'index.html' || currentPage.endsWith('/index.html');
     const loginUrl = new URL(
-      currentPage.split('/').length > 1 ? '../login.html' : 'login.html',
+      isHomePage ? 'login.html' : '../login.html',
       window.location.href
     );
     window.location.href = `${loginUrl.toString()}?t=${Date.now()}`;
