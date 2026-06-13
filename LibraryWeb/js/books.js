@@ -121,6 +121,10 @@ class BookManager {
    * 借阅图书
    */
   borrowBook(bookId) {
+    if (!this.permission.can('borrow', 'books')) {
+      throw new Error('没有权限借阅图书');
+    }
+
     const book = this.storage.getBookById(bookId);
     
     if (!book) {
@@ -131,26 +135,39 @@ class BookManager {
       throw new Error('该书已全部借出');
     }
     
-    const currentUser = this.permission.currentUser;
-    
-    if (!currentUser) {
+    const sessionUser = this.storage.getCurrentUser();
+    if (!sessionUser) {
       throw new Error('请先登录');
     }
-    
-    // 检查用户借阅限额
-    if (currentUser.currentBorrowCount >= currentUser.maxBorrowCount) {
-      throw new Error(`已达到最大借阅数量(${currentUser.maxBorrowCount}本)`);
+
+    const currentUser = this.storage.getUserById(sessionUser.id) || sessionUser;
+    this.permission.currentUser = currentUser;
+    this.permission.role = currentUser.role || 'guest';
+
+    const activeBorrowCount = this.storage.getBorrows().filter(b =>
+      b.userId === currentUser.id && (b.status === 'borrowing' || b.status === 'renewed')
+    ).length;
+    const maxBorrowCount = currentUser.maxBorrowCount || this.storage.getSettings().maxBorrowCount || 5;
+
+    if (activeBorrowCount >= maxBorrowCount) {
+      throw new Error(`已达到最大借阅数量(${maxBorrowCount}本)`);
     }
     
-    // 检查是否有逾期未还
     const userBorrows = this.storage.getUserBorrows(currentUser.id);
-    const hasOverdue = userBorrows.some(b => b.status === 'borrowing' && b.isOverdue);
+    const hasOverdue = userBorrows.some(b => (b.status === 'borrowing' || b.status === 'renewed') && b.isOverdue);
     
     if (hasOverdue) {
       throw new Error('有逾期未还图书，请先归还');
     }
+
+    const hasActiveBorrow = userBorrows.some(b =>
+      b.bookId === bookId && (b.status === 'borrowing' || b.status === 'renewed')
+    );
+
+    if (hasActiveBorrow) {
+      throw new Error('您已经借阅过这本书，不能重复借阅');
+    }
     
-    // 创建借阅记录
     const borrowManager = new BorrowManager();
     borrowManager.createBorrow(bookId);
     

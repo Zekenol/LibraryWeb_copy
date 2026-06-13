@@ -71,22 +71,13 @@ const Auth = {
   logout() {
     Storage.clearCurrentUser();
     localStorage.removeItem('sessionToken');
-    
-    // 计算到根目录的相对路径
-    const currentPath = window.location.pathname;
-    const pathParts = currentPath.split('/').filter(part => part);
-    
-    // 如果当前在子目录（如 /books/list.html），需要回到根目录
-    let relativePath = '';
-    if (pathParts.length > 1) {
-      // 对于每个子目录层级，添加 ../
-      for (let i = 0; i < pathParts.length - 1; i++) {
-        relativePath += '../';
-      }
-    }
-    
-    // 跳转到登录页，添加时间戳避免缓存
-    window.location.replace(relativePath + 'login.html?t=' + Date.now());
+
+    const loginUrl = new URL(
+      window.location.pathname.split('/').length > 2 ? '../login.html' : 'login.html',
+      window.location.href
+    );
+
+    window.location.href = `${loginUrl.toString()}?t=${Date.now()}`;
   },
   
   /**

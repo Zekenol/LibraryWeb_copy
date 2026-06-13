@@ -166,7 +166,7 @@
                         <a class="nav-link" href="#" id="userName">加载中...</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="Auth.logout()">退出</a>
+                        <a class="nav-link" href="javascript:void(0)" onclick="Auth.logout(); return false;">退出</a>
                     </li>
                 </ul>
             </div>
@@ -355,11 +355,11 @@
             const isOverdue = !borrow.returnDate && now > dueDate;
 
             if (borrow.returnDate) {
-                return '<span class="badge badge-success">已归还</span>';
+                return '<span class="badge badge-success text-dark">已归还</span>';
             } else if (isOverdue) {
-                return '<span class="badge badge-danger">逾期</span>';
+                return '<span class="badge badge-danger text-dark">逾期</span>';
             } else {
-                return '<span class="badge badge-primary">在借</span>';
+                return '<span class="badge badge-primary text-dark">在借</span>';
             }
         }
 

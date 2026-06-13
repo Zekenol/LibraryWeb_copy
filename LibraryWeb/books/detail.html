@@ -157,7 +157,7 @@
                         <a class="nav-link" href="#" id="userName">加载中...</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="Auth.logout()">退出</a>
+                        <a class="nav-link" href="javascript:void(0)" onclick="Auth.logout(); return false;">退出</a>
                     </li>
                 </ul>
             </div>
@@ -269,6 +269,7 @@
     <script src="../js/auth.js"></script>
     <script src="../js/permission.js"></script>
     <script src="../js/router-guard.js"></script>
+    <script src="../js/borrows.js"></script>
     <script src="../js/books.js"></script>
     <script>
         let currentBook = null;

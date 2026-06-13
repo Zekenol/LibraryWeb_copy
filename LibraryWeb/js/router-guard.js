@@ -44,15 +44,20 @@ const RouterGuard = {
    */
   checkAuth() {
     const currentPage = this.getCurrentPage();
-    
-    // 检查是否是受保护页面
-    if (this.protectedPages.includes(currentPage)) {
-      if (!Storage.isLoggedIn()) {
-        window.location.href = 'login.html';
-        return false;
-      }
+
+    if (!this.protectedPages.includes(currentPage)) {
+      return true;
     }
-    
+
+    if (!Storage.isLoggedIn()) {
+      const loginUrl = new URL(
+        currentPage.split('/').length > 1 ? '../login.html' : 'login.html',
+        window.location.href
+      );
+      window.location.replace(`${loginUrl.toString()}?t=${Date.now()}`);
+      return false;
+    }
+
     return true;
   },
   
@@ -80,9 +85,8 @@ const RouterGuard = {
    * 获取当前页面名称
    */
   getCurrentPage() {
-    const path = window.location.pathname;
-    const filename = path.split('/').pop();
-    return filename || 'index.html';
+    const path = window.location.pathname.replace(/^\/+/, '');
+    return path || 'index.html';
   },
   
   /**
@@ -96,7 +100,12 @@ const RouterGuard = {
    * 重定向到登录页
    */
   redirectToLogin() {
-    window.location.href = 'login.html';
+    const currentPage = this.getCurrentPage();
+    const loginUrl = new URL(
+      currentPage.split('/').length > 1 ? '../login.html' : 'login.html',
+      window.location.href
+    );
+    window.location.href = `${loginUrl.toString()}?t=${Date.now()}`;
   },
   
   /**

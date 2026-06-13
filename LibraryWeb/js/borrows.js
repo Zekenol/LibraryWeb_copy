@@ -13,12 +13,16 @@ class BorrowManager {
    * 创建借阅申请
    */
   createBorrow(bookId) {
-    const currentUser = this.permission.currentUser;
-    const book = this.storage.getBookById(bookId);
-    
-    if (!currentUser) {
+    const sessionUser = this.storage.getCurrentUser();
+    if (!sessionUser) {
       throw new Error('请先登录');
     }
+
+    const currentUser = this.storage.getUserById(sessionUser.id) || sessionUser;
+    this.permission.currentUser = currentUser;
+    this.permission.role = currentUser.role || 'guest';
+
+    const book = this.storage.getBookById(bookId);
     
     if (!book) {
       throw new Error('图书不存在');
@@ -88,10 +92,13 @@ class BorrowManager {
       throw new Error('借阅记录不存在');
     }
     
-    const currentUser = this.permission.currentUser;
-    
+    const sessionUser = this.storage.getCurrentUser();
+    const currentUser = this.storage.getUserById(sessionUser?.id) || sessionUser;
+    this.permission.currentUser = currentUser;
+    this.permission.role = currentUser?.role || 'guest';
+
     // 检查权限：只能归还自己的书，或者管理员可以归还所有
-    if (borrow.userId !== currentUser.id && !this.permission.hasRole('librarian')) {
+    if (!currentUser || (borrow.userId !== currentUser.id && !this.permission.hasRole('librarian'))) {
       throw new Error('无权操作此借阅记录');
     }
     
@@ -146,9 +153,12 @@ class BorrowManager {
       throw new Error('借阅记录不存在');
     }
     
-    const currentUser = this.permission.currentUser;
-    
-    if (borrow.userId !== currentUser.id) {
+    const sessionUser = this.storage.getCurrentUser();
+    const currentUser = this.storage.getUserById(sessionUser?.id) || sessionUser;
+    this.permission.currentUser = currentUser;
+    this.permission.role = currentUser?.role || 'guest';
+
+    if (!currentUser || borrow.userId !== currentUser.id) {
       throw new Error('只能续借自己的图书');
     }
     
@@ -183,21 +193,36 @@ class BorrowManager {
     if (book.availableCopies <= 0) {
       return { valid: false, message: '该书已全部借出' };
     }
-    
-    if (user.currentBorrowCount >= user.maxBorrowCount) {
-      return { valid: false, message: `已达到最大借阅数量(${user.maxBorrowCount}本)` };
+
+    const activeBorrowCount = this.storage.getBorrows().filter(b =>
+      b.userId === user.id && (b.status === 'borrowing' || b.status === 'renewed')
+    ).length;
+    const maxBorrowCount = user.maxBorrowCount || this.storage.getSettings().maxBorrowCount || 5;
+
+    if (activeBorrowCount >= maxBorrowCount) {
+      return { valid: false, message: `已达到最大借阅数量(${maxBorrowCount}本)` };
     }
     
     // 检查是否有逾期未还
     const borrows = this.storage.getBorrows();
     const hasOverdue = borrows.some(b => 
       b.userId === user.id && 
-      b.status === 'borrowing' && 
+      (b.status === 'borrowing' || b.status === 'renewed') && 
       b.isOverdue
     );
     
     if (hasOverdue) {
       return { valid: false, message: '有逾期未还图书，请先归还' };
+    }
+
+    const hasActiveBorrow = borrows.some(b =>
+      b.userId === user.id &&
+      b.bookId === book.id &&
+      (b.status === 'borrowing' || b.status === 'renewed')
+    );
+
+    if (hasActiveBorrow) {
+      return { valid: false, message: '您已经借阅过这本书，不能重复借阅' };
     }
     
     return { valid: true };
@@ -221,10 +246,19 @@ class BorrowManager {
     const borrows = this.storage.getBorrows();
     
     if (user) {
-      user.currentBorrowCount = borrows.filter(b => 
-        b.userId === userId && b.status === 'borrowing'
+      const currentBorrowCount = borrows.filter(b => 
+        b.userId === userId && (b.status === 'borrowing' || b.status === 'renewed')
       ).length;
+
+      user.currentBorrowCount = currentBorrowCount;
       this.storage.saveUsers(users);
+
+      const currentUser = this.storage.getCurrentUser();
+      if (currentUser && currentUser.id === userId) {
+        const sessionUser = { ...user };
+        delete sessionUser.password;
+        this.storage.setCurrentUser(sessionUser);
+      }
     }
   }
   
